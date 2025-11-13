@@ -44,20 +44,20 @@ export function Login({ onLogin }: LoginProps) {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream to-blush-pink-light p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 w-12 h-12 bg-blush-pink rounded-full flex items-center justify-center">
-            <Lock className="w-6 h-6 text-white" />
+      <Card className="shadow-lg" style={{ width: '500px', maxWidth: '500px' }}>
+        <CardHeader className="text-center space-y-3 pb-6">
+          <div className="mx-auto w-14 h-14 bg-blush-pink rounded-full flex items-center justify-center shadow-md">
+            <Lock className="w-7 h-7 text-white" />
           </div>
-          <CardTitle className="text-2xl">Admin Login</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl font-semibold">Admin Login</CardTitle>
+          <CardDescription className="text-sm">
             Sign in to access the admin panel
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className="px-6 pb-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -70,8 +70,8 @@ export function Login({ onLogin }: LoginProps) {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+            <div className="space-y-2 mt-4">
+              <Label htmlFor="password" className="text-sm font-medium mb-2">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -84,13 +84,13 @@ export function Login({ onLogin }: LoginProps) {
               />
             </div>
             {error && (
-              <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+              <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-200">
                 {error}
               </div>
             )}
             <Button
               type="submit"
-              className="w-full bg-blush-pink hover:bg-blush-pink-dark text-charcoal"
+              className="w-full bg-blush-pink hover:bg-blush-pink-dark text-charcoal font-medium mt-8"
               disabled={isLoading || !email || !password}
             >
               {isLoading ? 'Logging in...' : 'Login'}

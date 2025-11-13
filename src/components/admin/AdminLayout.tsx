@@ -15,7 +15,7 @@ export function AdminLayout({ children, currentSection = 'dashboard' }: AdminLay
   const handleLogout = async () => {
     const { logout } = await import('./AuthGuard');
     await logout();
-    window.location.href = '/';
+    window.location.href = '/admin';
   };
 
   const handleNavigation = (section: string) => {
