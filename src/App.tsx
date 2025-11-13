@@ -4,6 +4,7 @@ import { Router } from './components/Router';
 import { HomePage } from './pages/HomePage';
 import { ServicesPage } from './pages/ServicesPage';
 import { ServiceDetailPage } from './pages/ServiceDetailPage';
+import { AdminPage } from './pages/AdminPage';
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
             { path: '/', component: <HomePage /> },
             { path: '/services', component: <ServicesPage /> },
             { path: '/service/:id', component: <ServiceDetailPage /> },
+            { path: '/admin', component: <AdminPage /> },
           ]}
           defaultPath="/"
         />

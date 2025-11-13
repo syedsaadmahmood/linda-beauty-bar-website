@@ -1,6 +1,6 @@
 import { Phone, Mail, MapPin, Instagram, Facebook } from 'lucide-react';
 import { navigate } from './Router';
-import { categories } from '../data/categories';
+import { categories } from '../data/data';
 import logo from '../assets/logo-2.png';
 
 export function Footer() {

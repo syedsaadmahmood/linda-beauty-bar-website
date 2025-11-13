@@ -1,8 +1,24 @@
 import { Star } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
-import { testimonials } from '../data/testimonials';
+import { useState, useEffect } from 'react';
+import type { Testimonial } from '../data/types';
 
 export function Testimonials() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+
+  useEffect(() => {
+    const loadTestimonials = async () => {
+      try {
+        const { getTestimonials } = await import('../utils/adminStorage');
+        const data = await getTestimonials();
+        setTestimonials(data);
+      } catch (error) {
+        console.error('Error loading testimonials:', error);
+        setTestimonials([]);
+      }
+    };
+    loadTestimonials();
+  }, []);
   return (
     <section className="py-20 bg-gradient-to-br from-cream to-blush-pink-light">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -1,25 +1,24 @@
-export interface Service {
-  id: string;
-  title: string;
-  description: string;
-  longDescription: string;
-  price: string;
-  duration: string;
-  deposit: string;
-  category: string;
-  imageUrl: string;
-  benefits: string[];
-  process: string[];
-  aftercare: string[];
-  faqs: { question: string; answer: string }[];
-}
+// Consolidated Data File
+// All data types are imported from ./types.ts
+// All data arrays are exported here
+
+import { Brush, Smile, Heart, Eye, Dumbbell, Sparkles, Droplet, type LucideIcon } from 'lucide-react';
+import type {
+  Service,
+  Category,
+  Testimonial,
+  FAQCategory,
+  PortfolioCategory,
+  Portfolio,
+  ServiceHighlight,
+} from './types';
 
 export const servicesData: Service[] = [
   // EYEBROW SERVICES
   {
     id: 'ombre-powder-brows',
     title: 'Ombre Powder Brows',
-    category: 'Eyebrow Services',
+    categoryId: 'eyebrow-services',
     description: 'A semi-permanent makeup technique that creates a soft, shaded brow look',
     longDescription: 'Ombre Powder Brows is a semi-permanent makeup technique that creates a soft, shaded brow look using a pixelated application method. This results in beautifully defined and filled brows with a gradient effect that\'s lighter at the front and gradually darker toward the tail. Perfect for those who want a polished, makeup-filled look that lasts.',
     price: '$350',
@@ -72,7 +71,7 @@ export const servicesData: Service[] = [
   {
     id: 'ombre-brow-annual-touchup',
     title: 'Ombre Brow Annual Touch Up',
-    category: 'Eyebrow Services',
+    categoryId: 'eyebrow-services',
     description: 'Maintain your ombre brows with an annual refresh',
     longDescription: 'This is an ombre brow annual touch up for clients 3-18 months post last ombre brow appointment. Keep your brows looking fresh and vibrant with regular maintenance.',
     price: '$200',
@@ -107,7 +106,7 @@ export const servicesData: Service[] = [
   {
     id: 'ombre-brows-4-6-week-touchup',
     title: 'Ombre Brows 4-6 Week Touch Up',
-    category: 'Eyebrow Services',
+    categoryId: 'eyebrow-services',
     description: 'Perfecting session for recent ombre brow clients',
     longDescription: 'This is a service for previous clients only 4-6 weeks post initial session. This perfecting session ensures your brows heal beautifully and achieve the best possible results.',
     price: '$100',
@@ -141,7 +140,7 @@ export const servicesData: Service[] = [
   {
     id: 'microblading',
     title: 'Microblading',
-    category: 'Eyebrow Services',
+    categoryId: 'eyebrow-services',
     description: 'Natural looking, fuller brows with hair-like strokes',
     longDescription: 'Microblading is a semi-permanent makeup technique that creates natural-looking eyebrow hair strokes using a manual hand tool with ultra-fine needles. Each stroke is individually placed to mimic the natural direction and pattern of your brow hair, resulting in beautifully defined, yet completely natural-looking eyebrows. Results last 12-18 months.',
     price: '$350',
@@ -188,7 +187,7 @@ export const servicesData: Service[] = [
   {
     id: 'microblading-annual-touchup',
     title: 'Microblading Annual Touch Up',
-    category: 'Eyebrow Services',
+    categoryId: 'eyebrow-services',
     description: 'Annual refresh for microbladed brows',
     longDescription: 'This is an annual touch up 3-18 months post last Microblading session. Keep your hair-stroke brows looking fresh and natural with regular maintenance.',
     price: '$200',
@@ -223,7 +222,7 @@ export const servicesData: Service[] = [
   {
     id: 'microblading-4-8-week-touchup',
     title: 'Microblading 4-8 Week Touch Up',
-    category: 'Eyebrow Services',
+    categoryId: 'eyebrow-services',
     description: 'Perfecting session for recent microblading clients',
     longDescription: 'This is a service for previous clients 4-6 weeks post initial session. Perfect any areas and ensure optimal healing results.',
     price: '$100',
@@ -257,7 +256,7 @@ export const servicesData: Service[] = [
   {
     id: 'henna-brows',
     title: 'Henna Brows',
-    category: 'Eyebrow Services',
+    categoryId: 'eyebrow-services',
     description: 'Professional brow mapping, shaping, and henna tint',
     longDescription: 'A professional service that includes precise brow mapping to determine the ideal shape for your face, followed by expert shaping techniques to enhance your natural brows, finished with a henna tint for beautiful definition that lasts.',
     price: '$50',
@@ -300,7 +299,7 @@ export const servicesData: Service[] = [
   {
     id: 'lip-blush',
     title: 'Lip Blush',
-    category: 'Lip Services',
+    categoryId: 'lip-services',
     description: 'Semi-permanent lip color for a naturally tinted, fuller look',
     longDescription: 'A semi permanent tattoo that enhances the natural color and shape of your lips, giving them a soft, tinted look. Perfect for a fuller, more defined pout without daily lipstick. Correct asymmetry, enhance shape, and enjoy a youthful appearance.',
     price: '$300',
@@ -352,7 +351,7 @@ export const servicesData: Service[] = [
   {
     id: 'lip-blush-annual-touchup',
     title: 'Lip Blush Annual Touch Up',
-    category: 'Lip Services',
+    categoryId: 'lip-services',
     description: 'Annual refresh for lip blush clients',
     longDescription: 'This is an annual lip blush touch up 3-18 months after last session. Refresh your lip color and maintain that beautiful tinted look.',
     price: '$200',
@@ -387,7 +386,7 @@ export const servicesData: Service[] = [
   {
     id: 'lip-blush-4-6-week-touchup',
     title: 'Lip Blush 4-6 Week Touch Up',
-    category: 'Lip Services',
+    categoryId: 'lip-services',
     description: 'Perfecting session for recent lip blush clients',
     longDescription: 'This is a service for previous clients 4-6 weeks post initial lip blush appointment. Perfect the color and ensure beautiful healing.',
     price: '$100',
@@ -423,7 +422,7 @@ export const servicesData: Service[] = [
   {
     id: '3d-areola-reconstructive',
     title: '3D Areola Reconstructive Tattoo',
-    category: 'Paramedical Tattoo',
+    categoryId: 'paramedical-tattoo',
     description: 'Restore natural appearance after mastectomy or breast surgery',
     longDescription: 'Paramedical tattoo procedure that restores the natural look of the nipple after mastectomy, breast surgery, or trauma. Using advanced shading techniques and custom pigments, this service creates a realistic three-dimensional appearance that enhances confidence and body image.',
     price: '$250+',
@@ -472,7 +471,7 @@ export const servicesData: Service[] = [
   {
     id: 'scar-camouflage',
     title: 'Scar Camouflage',
-    category: 'Paramedical Tattoo',
+    categoryId: 'paramedical-tattoo',
     description: 'Reduce visibility of scars, stretch marks, and healed injuries',
     longDescription: 'Natural looking paramedical tattooing that blends scar tissue into surrounding skin tone. Minimally invasive, long-lasting results designed to reduce the contrast and visibility of surgical scars, stretch marks, and healed injuries. Consultation required to assess suitability.',
     price: '$150+',
@@ -522,7 +521,7 @@ export const servicesData: Service[] = [
   {
     id: 'paramedical-tattoo-complementary',
     title: 'Paramedical Tattoo Complementary Session',
-    category: 'Paramedical Tattoo',
+    categoryId: 'paramedical-tattoo',
     description: 'Complimentary perfecting session post initial treatment',
     longDescription: 'This is a complementary session 6 weeks post paramedical tattoo initial session. Allows us to assess healing and perfect the results at no additional charge.',
     price: '$0',
@@ -558,7 +557,7 @@ export const servicesData: Service[] = [
   {
     id: 'classic-full-set',
     title: 'Classic Full Set',
-    category: 'Lash Extensions',
+    categoryId: 'lash-extensions',
     description: 'Natural, timeless lash extensions - one lash per natural lash',
     longDescription: 'A natural and timeless look where one lightweight extension is applied to each natural lash, creating added length, curl, and definition. Perfect for clients who want a simple, elegant enhancement that mimics the look of mascara without the daily effort.',
     price: '$120',
@@ -603,7 +602,7 @@ export const servicesData: Service[] = [
   {
     id: 'wet-lash-full-set',
     title: 'Full Set Of Wet Lash Extensions',
-    category: 'Lash Extensions',
+    categoryId: 'lash-extensions',
     description: 'Fully customized wet-look lash extension set',
     longDescription: 'Fully customized eyelash extension set designed just for you! Includes a complementary at-home care package to keep your lashes looking flawless. The wet lash look creates a glossy, freshly-applied mascara appearance.',
     price: '$125',
@@ -643,7 +642,7 @@ export const servicesData: Service[] = [
   {
     id: 'hybrid-full-set',
     title: 'Hybrid Full Set',
-    category: 'Lash Extensions',
+    categoryId: 'lash-extensions',
     description: 'Mix of classic and volume techniques for soft fullness',
     longDescription: 'A beautiful mix of classic and volume techniques, combining individual lashes with lightweight fans. This set gives more fullness than classic while still looking soft and natural. Perfect for those who want dimension and texture.',
     price: '$130',
@@ -682,7 +681,7 @@ export const servicesData: Service[] = [
   {
     id: 'volume-full-set',
     title: 'Volume Full Set',
-    category: 'Lash Extensions',
+    categoryId: 'lash-extensions',
     description: 'Lush, fluffy, dramatic lashes with ultra-lightweight fans',
     longDescription: 'A lush, fluffy look created by applying ultra-lightweight fans to each natural lash. Adds noticeable fullness, depth, and drama. Perfect for clients who love bold, glamorous lashes and want maximum impact.',
     price: '$145',
@@ -728,7 +727,7 @@ export const servicesData: Service[] = [
   {
     id: 'lash-refill-2-3-weeks',
     title: 'Lash Extension Refill 2-3 Weeks',
-    category: 'Lash Extensions',
+    categoryId: 'lash-extensions',
     description: 'Maintenance fill to keep lashes full and voluminous',
     longDescription: 'A maintenance service to fill in any gaps or areas where lash extensions have shed, ensuring a full and voluminous lash look is maintained between full sets. Essential for keeping your lashes looking fresh.',
     price: '$75',
@@ -769,7 +768,7 @@ export const servicesData: Service[] = [
   {
     id: 'lash-removal-and-bath',
     title: 'Lash Removal And Bath',
-    category: 'Lash Extensions',
+    categoryId: 'lash-extensions',
     description: 'Gentle removal and deep cleansing for natural lashes',
     longDescription: 'Gently removes lash extensions without damage to your natural lashes, followed by a deep cleansing bath to eliminate any residue, oils, and buildup. Leaves your natural lashes clean and healthy.',
     price: '$35',
@@ -812,7 +811,7 @@ export const servicesData: Service[] = [
   {
     id: 'foreign-lash-fill',
     title: 'Foreign Lash Fill',
-    category: 'Lash Extensions',
+    categoryId: 'lash-extensions',
     description: 'Fill service for new clients with existing extensions',
     longDescription: 'This is a 2-3 week lash fill for new clients coming for the first time with existing extensions from another salon. Includes your at-home care package to get you started with proper maintenance.',
     price: '$95',
@@ -851,7 +850,7 @@ export const servicesData: Service[] = [
   {
     id: 'body-sculpting-50min-1area',
     title: 'Body Sculpting 50 Min Session (1 Area)',
-    category: 'Body Sculpting',
+    categoryId: 'body-sculpting',
     description: 'Non-invasive body contouring with cavitation, RF, lipo laser & wood therapy',
     longDescription: 'One area only. 60 minute session includes a mix of cavitation, radio frequency, lipo laser, and wood therapy. Non-invasive treatments to target stubborn fat, tighten skin, and contour your body.',
     price: '$80',
@@ -896,7 +895,7 @@ export const servicesData: Service[] = [
   {
     id: 'body-sculpting-75min-2areas',
     title: '75 Min Session (2 Areas)',
-    category: 'Body Sculpting',
+    categoryId: 'body-sculpting',
     description: 'Extended body sculpting session for two treatment areas',
     longDescription: 'This is a 75 minute session covering up to 2 areas. Includes cavitation, radio frequency, lipo laser, and wood therapy for comprehensive body contouring.',
     price: '$100',
@@ -935,7 +934,7 @@ export const servicesData: Service[] = [
   {
     id: 'non-invasive-butt-lift',
     title: 'Non Invasive Butt Lift',
-    category: 'Body Sculpting',
+    categoryId: 'body-sculpting',
     description: 'Vacuum therapy & RF for a rounder, firmer appearance',
     longDescription: 'Uses advanced vacuum therapy and radio frequency to stimulate muscle, boost collagen production, and improve skin elasticity for a rounder, firmer appearance. Non-surgical butt enhancement.',
     price: '$60',
@@ -979,7 +978,7 @@ export const servicesData: Service[] = [
   {
     id: '20min-cavitation',
     title: '20 Min Cavitation',
-    category: 'Body Sculpting',
+    categoryId: 'body-sculpting',
     description: 'Quick ultrasound fat reduction treatment',
     longDescription: 'A quick, non-invasive treatment that uses ultrasound technology to target stubborn fat cells, helping to smooth and contour the body. Perfect as an add-on or standalone treatment.',
     price: '$50',
@@ -1015,7 +1014,7 @@ export const servicesData: Service[] = [
   {
     id: '20min-radiofrequency',
     title: '20 Min Radiofrequency',
-    category: 'Body Sculpting',
+    categoryId: 'body-sculpting',
     description: 'Skin tightening treatment with heat energy',
     longDescription: 'A skin tightening treatment that uses heat energy to stimulate collagen and elastin, reducing the appearance of fine lines and leaving the skin firm and more youthful.',
     price: '$50',
@@ -1053,7 +1052,7 @@ export const servicesData: Service[] = [
   {
     id: '30min-lipo-laser',
     title: '30 Min Lipo Laser',
-    category: 'Body Sculpting',
+    categoryId: 'body-sculpting',
     description: 'Low-level laser technology for body contouring',
     longDescription: 'A safe non-invasive body contouring treatment that uses low-level laser technology to target stubborn fat cells, helping to reduce inches, tighten skin, and improve overall body shape with no downtime.',
     price: '$50',
@@ -1093,7 +1092,7 @@ export const servicesData: Service[] = [
   {
     id: 'teeth-whitening-60min',
     title: 'Teeth Whitening 60 Min Session',
-    category: 'Teeth Whitening',
+    categoryId: 'teeth-whitening',
     description: 'Professional laser teeth whitening for a brighter smile',
     longDescription: 'Our professional laser teeth whitening treatment uses advanced technology to safely and effectively lift deep stains caused by coffee, wine, smoking, and aging. Achieve a noticeably brighter, whiter smile in just one session.',
     price: '$150',
@@ -1142,7 +1141,7 @@ export const servicesData: Service[] = [
   {
     id: 'teeth-whitening-80min',
     title: 'Teeth Whitening 80 Min',
-    category: 'Teeth Whitening',
+    categoryId: 'teeth-whitening',
     description: 'Extended teeth whitening session for maximum results',
     longDescription: 'Extended 80-minute professional teeth whitening session for those who want maximum whitening results. Perfect for heavily stained teeth or those seeking the brightest possible smile.',
     price: '$180',
@@ -1188,7 +1187,7 @@ export const servicesData: Service[] = [
   {
     id: 'teeth-whitening-class',
     title: 'Teeth Whitening Class',
-    category: 'Teeth Whitening',
+    categoryId: 'teeth-whitening',
     description: 'Professional training for beauty professionals',
     longDescription: 'One day class with full kit included, manual, certification, and live model. Learn to offer professional teeth whitening services in your own business. Perfect for beauty professionals looking to expand their service menu.',
     price: '$1,000',
@@ -1234,15 +1233,341 @@ export const servicesData: Service[] = [
     ],
   },
 ];
-
-// Service categories are now defined in ../data/categories.ts
-// This export is kept for backward compatibility but will be removed
-export const serviceCategories = [
-  'All Services',
-  'Eyebrow Services',
-  'Lip Services',
-  'Paramedical Tattoo',
-  'Lash Extensions',
-  'Body Sculpting',
-  'Teeth Whitening',
+export const categories: Category[] = [
+  {
+    id: 'eyebrow-services',
+    name: 'Eyebrow Services',
+    icon: Brush,
+  },
+  {
+    id: 'lip-services',
+    name: 'Lip Services',
+    icon: Smile,
+  },
+  {
+    id: 'lash-extensions',
+    name: 'Lash Extensions',
+    icon: Eye,
+  },
+  {
+    id: 'paramedical-tattoo',
+    name: 'Paramedical Tattoo',
+    icon: Heart,
+  },
+  {
+    id: 'body-sculpting',
+    name: 'Body Sculpting',
+    icon: Dumbbell,
+  },
+  {
+    id: 'teeth-whitening',
+    name: 'Teeth Whitening',
+    icon: Sparkles,
+  },
 ];
+
+export const allCategories = ['All Services', ...categories.map(cat => cat.name)];
+
+// Helper function to get category by ID
+export function getCategoryById(id: string): Category | undefined {
+  return categories.find(cat => cat.id === id);
+}
+
+// Helper function to get category by name
+export function getCategoryByName(name: string): Category | undefined {
+  return categories.find(cat => cat.name === name);
+}
+
+// Helper function to get category icon by name or ID
+export function getCategoryIcon(nameOrId: string): LucideIcon {
+  const category = getCategoryByName(nameOrId) || getCategoryById(nameOrId);
+  return category ? category.icon : Droplet;
+}
+
+// Helper function to get category name from ID
+export function getCategoryNameById(id: string): string | undefined {
+  const category = getCategoryById(id);
+  return category?.name;
+}
+
+export const testimonials: Testimonial[] = [
+  {
+    id: 1,
+    name: 'Sarah Johnson',
+    service: 'Microblading',
+    rating: 5,
+    text: 'Linda is an absolute artist! My eyebrows look so natural and perfectly shaped. I wake up every morning feeling confident. Best decision I\'ve ever made!',
+    date: 'October 2025',
+  },
+  {
+    id: 2,
+    name: 'Emily Chen',
+    service: 'Powder Brows',
+    rating: 5,
+    text: 'I was nervous at first, but Linda made me feel so comfortable. The results are stunning - my brows look like I just had them filled in with makeup. Absolutely love it!',
+    date: 'September 2025',
+  },
+  {
+    id: 3,
+    name: 'Jessica Martinez',
+    service: 'Lip Blush',
+    rating: 5,
+    text: 'The lip blush procedure gave me the perfect natural tint I was looking for. Linda is so professional and talented. I recommend her to everyone!',
+    date: 'September 2025',
+  },
+  {
+    id: 4,
+    name: 'Amanda Thompson',
+    service: 'Permanent Eyeliner',
+    rating: 5,
+    text: 'I save so much time in the morning now! My eyeliner looks perfect every day. Linda\'s attention to detail is incredible. Thank you for making me feel beautiful!',
+    date: 'August 2025',
+  },
+];
+
+export const faqCategories: FAQCategory[] = [
+  {
+    category: 'General Questions',
+    questions: [
+      {
+        id: 'general-1',
+        question: 'What is permanent makeup?',
+        answer: 'Permanent makeup, also known as cosmetic tattooing or micropigmentation, is a cosmetic technique that employs tattoos as a means of producing designs that resemble makeup. It involves depositing pigment into the dermal layer of the skin to enhance facial features such as eyebrows, lips, and eyeliner.'
+      },
+      {
+        id: 'general-2',
+        question: 'Is permanent makeup really permanent?',
+        answer: 'Despite the name, permanent makeup is semi-permanent. While the pigment is deposited into the skin and lasts longer than traditional makeup, it will gradually fade over time (typically 1-5 years depending on the procedure, skin type, and aftercare). Touch-ups are recommended to maintain the desired look.'
+      },
+      {
+        id: 'general-3',
+        question: 'Does permanent makeup hurt?',
+        answer: 'Most clients experience minimal discomfort during the procedure. We use topical numbing creams to minimize any sensation. The level of discomfort varies by individual pain tolerance and the area being treated. Most clients describe the sensation as tolerable and well worth the results.'
+      },
+      {
+        id: 'general-4',
+        question: 'How long does the procedure take?',
+        answer: 'The duration varies depending on the service. Eyebrow procedures typically take 2-3 hours, lip procedures take 2-2.5 hours, and eyeliner takes 1.5-2 hours. This includes consultation, numbing time, the actual procedure, and aftercare instructions.'
+      }
+    ]
+  },
+  {
+    category: 'Before Your Appointment',
+    questions: [
+      {
+        id: 'before-1',
+        question: 'How should I prepare for my appointment?',
+        answer: 'Avoid alcohol, caffeine, and blood-thinning medications for 24-48 hours before your appointment. Do not tweeze, wax, or tint your brows for at least one week prior. Arrive with a clean face, free of makeup. If you have a history of cold sores and are getting lip work done, consult your doctor about taking antiviral medication.'
+      },
+      {
+        id: 'before-2',
+        question: 'Can I wear makeup to my appointment?',
+        answer: 'Please arrive with a clean face, free of makeup in the area being treated. You may wear makeup on other areas of your face if desired. This ensures we can properly assess your natural features and skin tone.'
+      },
+      {
+        id: 'before-3',
+        question: 'Who is not a good candidate for permanent makeup?',
+        answer: 'Permanent makeup may not be suitable for individuals who are pregnant or nursing, undergoing chemotherapy, have certain skin conditions, have diabetes that is not well controlled, have a history of keloid scarring, or are on certain medications. A consultation is required to determine candidacy.'
+      },
+      {
+        id: 'before-4',
+        question: 'Can I bring reference photos?',
+        answer: 'Absolutely! We encourage you to bring photos of brow shapes, lip colors, or eyeliner styles you like. This helps us understand your aesthetic preferences. During the consultation, we\'ll discuss what will work best for your unique facial features.'
+      }
+    ]
+  },
+  {
+    category: 'Aftercare & Healing',
+    questions: [
+      {
+        id: 'aftercare-1',
+        question: 'What is the healing process like?',
+        answer: 'The initial healing takes 7-14 days. During this time, you may experience some tenderness, slight swelling, and the color will appear darker. The treated area will scab and flake as it heals. Full healing and true color results take 4-6 weeks. A touch-up appointment is typically needed 6-8 weeks after the initial procedure.'
+      },
+      {
+        id: 'aftercare-2',
+        question: 'How do I care for my permanent makeup after the procedure?',
+        answer: 'Keep the area clean and dry for the first 24 hours. Apply the provided aftercare ointment as directed. Avoid getting the area wet, swimming, saunas, and excessive sweating for 10-14 days. Do not pick at scabs or apply makeup to the area until fully healed. Avoid direct sun exposure and tanning beds.'
+      },
+      {
+        id: 'aftercare-3',
+        question: 'Can I shower after my procedure?',
+        answer: 'Yes, you can shower, but avoid getting the treated area directly wet for the first 7-10 days. When washing your face, use a gentle cleanser and avoid the treated area. Pat dry gently with a clean towel.'
+      },
+      {
+        id: 'aftercare-4',
+        question: 'When can I wear makeup again?',
+        answer: 'You should avoid applying makeup to the treated area for at least 10-14 days or until completely healed. You can wear makeup on other areas of your face immediately after the procedure. Once healed, you can apply makeup as normal.'
+      }
+    ]
+  },
+  {
+    category: 'Results & Maintenance',
+    questions: [
+      {
+        id: 'results-1',
+        question: 'How long do results last?',
+        answer: 'Results typically last 1-5 years depending on the procedure, your skin type, lifestyle, and sun exposure. Eyebrows usually last 1-3 years, lips 2-5 years, and eyeliner 3-5 years. Oily skin types may experience faster fading. Annual touch-ups help maintain optimal results.'
+      },
+      {
+        id: 'results-2',
+        question: 'Will the color fade?',
+        answer: 'Yes, the pigment will gradually fade over time due to sun exposure, skin regeneration, and other factors. This is why periodic touch-ups are recommended to keep your permanent makeup looking fresh and vibrant. The rate of fading varies by individual.'
+      },
+      {
+        id: 'results-3',
+        question: 'When will I see the final results?',
+        answer: 'While you\'ll see immediate results, the true final color and shape will be visible after 4-6 weeks once the skin has completely healed. The color will appear darker immediately after the procedure and during the first week, then will lighten during healing.'
+      },
+      {
+        id: 'results-4',
+        question: 'How often do I need touch-ups?',
+        answer: 'A touch-up is typically needed 6-8 weeks after your initial procedure to perfect the color and shape. After that, annual or bi-annual touch-ups are recommended to maintain the best results, depending on how quickly your skin metabolizes the pigment.'
+      }
+    ]
+  },
+  {
+    category: 'Specific Services',
+    questions: [
+      {
+        id: 'service-1',
+        question: 'What\'s the difference between microblading and powder brows?',
+        answer: 'Microblading creates hair-like strokes using a manual blade, giving a natural, feathered look. Powder brows use a machine to create a soft, powdered effect similar to filled-in brows with makeup. Powder brows tend to last longer and work better for oily skin types, while microblading is ideal for those wanting a more natural, hair-stroke appearance.'
+      },
+      {
+        id: 'service-2',
+        question: 'Can I get permanent makeup if I have existing tattoos in the area?',
+        answer: 'It depends on the existing tattoo. During your consultation, we\'ll assess whether we can work with or around existing permanent makeup or tattoos. In some cases, removal or lightening may be necessary before a new procedure.'
+      },
+      {
+        id: 'service-3',
+        question: 'Do you offer scar camouflage?',
+        answer: 'Yes, we offer paramedical tattooing services including scar camouflage. This technique can help blend scars with surrounding skin tone. A consultation is required to determine if your scar is a good candidate for this treatment.'
+      },
+      {
+        id: 'service-4',
+        question: 'Can I get multiple services in one appointment?',
+        answer: 'While it\'s possible to combine some services, we typically recommend spacing procedures apart to ensure proper healing and the best results. During your consultation, we can discuss the best approach for your desired services.'
+      }
+    ]
+  },
+  {
+    category: 'Pricing & Booking',
+    questions: [
+      {
+        id: 'pricing-1',
+        question: 'How much does permanent makeup cost?',
+        answer: 'Pricing varies depending on the service. Each service page on our website lists detailed pricing information. Initial procedures typically include a touch-up appointment. We believe in transparent pricing with no hidden fees.'
+      },
+      {
+        id: 'pricing-2',
+        question: 'Do you require a deposit?',
+        answer: 'Yes, a deposit is required to secure your appointment. This deposit is applied to the cost of your service. Deposits are non-refundable but can be transferred to another date with adequate notice.'
+      },
+      {
+        id: 'pricing-3',
+        question: 'Do you offer consultations?',
+        answer: 'Yes, we offer complimentary consultations for all new clients. This allows us to discuss your goals, assess your candidacy, review your medical history, and create a customized plan. You can book a consultation through our website.'
+      },
+      {
+        id: 'pricing-4',
+        question: 'What is your cancellation policy?',
+        answer: 'We require at least 48 hours notice for cancellations or rescheduling. Cancellations made with less than 48 hours notice will forfeit their deposit. We understand emergencies happen and handle these on a case-by-case basis.'
+      }
+    ]
+  },
+];
+
+// Portfolio Categories
+export const portfolioCategories: PortfolioCategory[] = [
+  { id: 'microblading', name: 'Microblading' },
+  { id: 'powder-brows', name: 'Powder Brows' },
+  { id: 'eyeliner', name: 'Eyeliner' },
+  { id: 'lip-blush', name: 'Lip Blush' },
+];
+
+// Portfolio Items
+export const portfolio: Portfolio[] = [
+  {
+    id: 1,
+    categoryId: 'microblading',
+    title: 'Microblading Transformation',
+    alt: 'Microblading before and after',
+    imageUrl: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800',
+  },
+  {
+    id: 2,
+    categoryId: 'powder-brows',
+    title: 'Powder Brows Results',
+    alt: 'Powder brows transformation',
+    imageUrl: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800',
+  },
+  {
+    id: 3,
+    categoryId: 'eyeliner',
+    title: 'Permanent Eyeliner',
+    alt: 'Permanent eyeliner results',
+    imageUrl: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800',
+  },
+  {
+    id: 4,
+    categoryId: 'lip-blush',
+    title: 'Lip Blush Enhancement',
+    alt: 'Lip blush before and after',
+    imageUrl: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800',
+  },
+  {
+    id: 5,
+    categoryId: 'microblading',
+    title: 'Natural Microblading',
+    alt: 'Natural microblading results',
+    imageUrl: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800',
+  },
+  {
+    id: 6,
+    categoryId: 'powder-brows',
+    title: 'Ombre Powder Brows',
+    alt: 'Ombre powder brows',
+    imageUrl: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800',
+  },
+];
+
+export const serviceHighlights: ServiceHighlight[] = [
+  {
+    categoryId: 'eyebrow-services',
+    title: 'Brow Services',
+    description: 'From microblading to ombre powder brows and henna tinting - we offer complete eyebrow enhancement services.',
+    icon: Brush,
+  },
+  {
+    categoryId: 'lip-services',
+    title: 'Lip Blush',
+    description: 'Semi-permanent lip color for naturally fuller, beautifully tinted lips without daily lipstick.',
+    icon: Smile,
+  },
+  {
+    categoryId: 'lash-extensions',
+    title: 'Lash Extensions',
+    description: 'Classic, volume, hybrid, and wet lash sets. Wake up with beautiful lashes every day.',
+    icon: Eye,
+  },
+  {
+    categoryId: 'paramedical-tattoo',
+    title: 'Paramedical Services',
+    description: 'Areola reconstruction and scar camouflage tattooing to restore confidence and natural appearance.',
+    icon: Heart,
+  },
+  {
+    categoryId: 'body-sculpting',
+    title: 'Body Sculpting',
+    description: 'Non-invasive body contouring with cavitation, RF, lipo laser, and wood therapy treatments.',
+    icon: Dumbbell,
+  },
+  {
+    categoryId: 'teeth-whitening',
+    title: 'Teeth Whitening',
+    description: 'Professional laser teeth whitening for a brighter, more confident smile in just one session.',
+    icon: Sparkles,
+  },
+];
+

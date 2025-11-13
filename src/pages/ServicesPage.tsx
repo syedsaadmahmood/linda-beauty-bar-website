@@ -1,14 +1,30 @@
 import { useState, useEffect } from 'react';
-import { servicesData } from '../data/services';
-import { categories, allCategories, getCategoryById, getCategoryIcon } from '../data/categories';
+import { getServices } from '../utils/adminStorage';
+import { categories, allCategories, getCategoryById, getCategoryIcon, getCategoryNameById } from '../data/data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { navigate, useSearchParams } from '../components/Router';
+import { SEO } from '../components/SEO';
 
 export function ServicesPage() {
   const searchParams = useSearchParams();
   const categoryIdFromUrl = searchParams.get('category');
   const [selectedCategoryName, setSelectedCategoryName] = useState('All Services');
+  const [services, setServices] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadServices = async () => {
+      try {
+        const data = await getServices();
+        setServices(data);
+      } catch (error) {
+        console.error('Error loading services:', error);
+        // Show empty state on error - user should seed database first
+        setServices([]);
+      }
+    };
+    loadServices();
+  }, []);
 
   useEffect(() => {
     if (categoryIdFromUrl) {
@@ -36,11 +52,20 @@ export function ServicesPage() {
   };
 
   const filteredServices = selectedCategoryName === 'All Services'
-    ? servicesData
-    : servicesData.filter(service => service.category === selectedCategoryName);
+    ? services
+    : services.filter(service => {
+        const serviceCategoryName = getCategoryNameById(service.categoryId);
+        return serviceCategoryName === selectedCategoryName;
+      });
 
   return (
-    <section className="py-20 bg-cream min-h-screen">
+    <>
+      <SEO
+        metaTitle="Our Services - Linda's Beauty Bar"
+        metaDescription="Explore our comprehensive range of beauty services including microblading, powder brows, lip blush, eyeliner, and more."
+        tags={['beauty services', 'permanent makeup', 'cosmetic services']}
+      />
+      <section className="py-20 bg-cream min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -70,7 +95,8 @@ export function ServicesPage() {
         {/* Services Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredServices.map((service) => {
-            const Icon = getCategoryIcon(service.category);
+            const Icon = getCategoryIcon(service.categoryId);
+            const categoryName = getCategoryNameById(service.categoryId) || 'Service';
             return (
               <Card 
                 key={service.id} 
@@ -81,7 +107,7 @@ export function ServicesPage() {
                   <div className="w-12 h-12 bg-blush-pink-light rounded-lg flex items-center justify-center mb-4 group-hover:bg-blush-pink transition-colors">
                     <Icon className="w-6 h-6 text-blush-pink group-hover:text-white transition-colors" />
                   </div>
-                  <div className="text-xs text-blush-pink mb-2">{service.category}</div>
+                  <div className="text-xs text-blush-pink mb-2">{categoryName}</div>
                   <CardTitle className="group-hover:text-blush-pink transition-colors">{service.title}</CardTitle>
                   <CardDescription className="text-base mt-2 line-clamp-2">
                     {service.description}
@@ -95,7 +121,7 @@ export function ServicesPage() {
                     </div>
                   </div>
                   <Button 
-                    onClick={(e) => {
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                       e.stopPropagation();
                       navigate(`/service/${service.id}`);
                     }}
@@ -130,5 +156,6 @@ export function ServicesPage() {
         </div>
       </div>
     </section>
+    </>
   );
 }

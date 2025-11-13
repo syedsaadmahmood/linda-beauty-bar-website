@@ -5,9 +5,25 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from './ui/accordion';
-import { faqCategories } from '../data/faq';
+import { useState, useEffect } from 'react';
+import type { FAQCategory, FAQItem } from '../data/types';
 
 export function FAQ() {
+  const [faqCategories, setFaqCategories] = useState<FAQCategory[]>([]);
+
+  useEffect(() => {
+    const loadFAQs = async () => {
+      try {
+        const { getFAQCategories } = await import('../utils/adminStorage');
+        const data = await getFAQCategories();
+        setFaqCategories(data);
+      } catch (error) {
+        console.error('Error loading FAQ categories:', error);
+        setFaqCategories([]);
+      }
+    };
+    loadFAQs();
+  }, []);
   return (
     <section id="faq" className="py-20 bg-cream">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -26,7 +42,7 @@ export function FAQ() {
             <div key={categoryIndex} className="bg-white rounded-lg shadow-sm p-6">
               <h3 className="text-2xl text-charcoal mb-4">{category.category}</h3>
               <Accordion type="single" collapsible className="w-full">
-                {category.questions.map((item) => (
+                {category.questions.map((item: FAQItem) => (
                   <AccordionItem key={item.id} value={item.id} className="border-blush-pink-light/30">
                     <AccordionTrigger className="text-left hover:text-blush-pink">
                       {item.question}

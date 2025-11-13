@@ -1,10 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { portfolioImages, type PortfolioImage } from '../data/portfolio';
+import type { Portfolio, PortfolioCategory } from '../data/types';
 
 export function Portfolio() {
   const [activeTab, setActiveTab] = useState('all');
+  const [portfolioItems, setPortfolioItems] = useState<Portfolio[]>([]);
+  const [categories, setCategories] = useState<PortfolioCategory[]>([]);
+
+  useEffect(() => {
+    const loadPortfolio = async () => {
+      try {
+        const { getPortfolio, getPortfolioCategories } = await import('../utils/adminStorage');
+        const [items, cats] = await Promise.all([
+          getPortfolio(),
+          getPortfolioCategories(),
+        ]);
+        setPortfolioItems(items);
+        setCategories(cats);
+      } catch (error) {
+        console.error('Error loading portfolio:', error);
+        setPortfolioItems([]);
+        setCategories([]);
+      }
+    };
+    loadPortfolio();
+  }, []);
 
   return (
     <section id="portfolio" className="py-20 bg-white">
@@ -19,37 +40,66 @@ export function Portfolio() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-5 mb-8">
             <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="microblading">Microblading</TabsTrigger>
-            <TabsTrigger value="powder-brows">Powder Brows</TabsTrigger>
-            <TabsTrigger value="eyeliner">Eyeliner</TabsTrigger>
-            <TabsTrigger value="lip-blush">Lip Blush</TabsTrigger>
+            {categories.map(cat => (
+              <TabsTrigger key={cat.id} value={cat.id}>{cat.name}</TabsTrigger>
+            ))}
           </TabsList>
 
-          {Object.entries(portfolioImages).map(([category, images]) => (
-            <TabsContent key={category} value={category} className="mt-0">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {images.map((image: PortfolioImage) => (
+          <TabsContent value="all" className="mt-0">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {portfolioItems.map((item) => {
+                const categoryName = categories.find(c => c.id === item.categoryId)?.name || '';
+                return (
                   <div
-                    key={image.id}
+                    key={item.id}
                     className="aspect-square rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow group cursor-pointer"
                   >
                     <div className="relative w-full h-full">
                       <ImageWithFallback
-                        src="https://images.unsplash.com/photo-1521146764736-56c929d59c83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwZXJtYW5lbnQlMjBtYWtldXAlMjBleWVicm93c3xlbnwxfHx8fDE3NjE2MDY1OTl8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                        alt={image.alt}
+                        src={item.imageUrl}
+                        alt={item.alt}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                         <div className="absolute bottom-4 left-4 text-white">
-                          <p className="text-sm capitalize">{image.category.replace('-', ' ')}</p>
+                          <p className="text-sm capitalize">{categoryName.replace('-', ' ')}</p>
                         </div>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </TabsContent>
-          ))}
+                );
+              })}
+            </div>
+          </TabsContent>
+
+          {categories.map(category => {
+            const categoryItems = portfolioItems.filter(item => item.categoryId === category.id);
+            return (
+              <TabsContent key={category.id} value={category.id} className="mt-0">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {categoryItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className="aspect-square rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow group cursor-pointer"
+                    >
+                      <div className="relative w-full h-full">
+                        <ImageWithFallback
+                          src={item.imageUrl}
+                          alt={item.alt}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="absolute bottom-4 left-4 text-white">
+                            <p className="text-sm capitalize">{category.name.replace('-', ' ')}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+            );
+          })}
         </Tabs>
 
         <div className="text-center mt-12">
