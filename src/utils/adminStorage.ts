@@ -866,6 +866,7 @@ function serviceHighlightToDbRow(highlight: ServiceHighlight): any {
     title: highlight.title,
     description: highlight.description,
     icon_name: iconName,
+    display_order: (highlight as any).display_order ?? 0, // Preserve order if provided
     updated_at: new Date().toISOString(),
   };
 }
@@ -913,7 +914,7 @@ export async function getServiceHighlights(useCache = true): Promise<ServiceHigh
     const { data, error } = await supabase
       .from(TABLES.serviceHighlights)
       .select('*')
-      .order('title', { ascending: true });
+      .order('display_order', { ascending: true });
 
     if (error) {
       console.error('Error fetching service highlights from Supabase:', error);
@@ -1049,4 +1050,70 @@ export async function resetToDefaults(): Promise<void> {
     console.error('Error resetting data:', error);
     throw error;
   }
+}
+
+// Helper functions to replace data.ts helpers
+// These work with categories fetched from Supabase
+
+/**
+ * Get category by ID
+ * @param id Category ID
+ * @param categories Optional categories array (if not provided, will fetch from Supabase)
+ */
+export async function getCategoryById(id: string, categories?: Category[]): Promise<Category | undefined> {
+  const cats = categories || await getCategories();
+  return cats.find(cat => cat.id === id);
+}
+
+/**
+ * Get category by name
+ * @param name Category name
+ * @param categories Optional categories array (if not provided, will fetch from Supabase)
+ */
+export async function getCategoryByName(name: string, categories?: Category[]): Promise<Category | undefined> {
+  const cats = categories || await getCategories();
+  return cats.find(cat => cat.name === name);
+}
+
+/**
+ * Get category icon component by name or ID
+ * @param nameOrId Category name or ID
+ * @param categories Optional categories array (if not provided, will fetch from Supabase)
+ */
+export async function getCategoryIcon(nameOrId: string, categories?: Category[]): Promise<lucideReact.LucideIcon> {
+  const cats = categories || await getCategories();
+  const category = cats.find(cat => cat.name === nameOrId || cat.id === nameOrId);
+  
+  if (!category) {
+    return lucideReact.Droplet;
+  }
+  
+  // Handle icon - it might be a string or component
+  if (typeof category.icon === 'string') {
+    const iconName = category.icon.trim();
+    const Icon = (lucideReact as any)[iconName];
+    return Icon || lucideReact.Droplet;
+  }
+  
+  // If it's already a component, return it
+  return category.icon as lucideReact.LucideIcon;
+}
+
+/**
+ * Get category name by ID
+ * @param id Category ID
+ * @param categories Optional categories array (if not provided, will fetch from Supabase)
+ */
+export async function getCategoryNameById(id: string, categories?: Category[]): Promise<string | undefined> {
+  const category = await getCategoryById(id, categories);
+  return category?.name;
+}
+
+/**
+ * Get all category names including "All Services"
+ * @param categories Optional categories array (if not provided, will fetch from Supabase)
+ */
+export async function getAllCategories(categories?: Category[]): Promise<string[]> {
+  const cats = categories || await getCategories();
+  return ['All Services', ...cats.map(cat => cat.name)];
 }

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getServices, saveService, deleteService, getCategories, saveCategory, deleteCategory, getServiceHighlights, saveServiceHighlight, deleteServiceHighlight, type Service, type Category, type ServiceHighlight } from '../../utils/adminStorage';
-import { getCategoryNameById } from '../../data/data';
+import { getServices, saveService, deleteService, getCategories, saveCategory, deleteCategory, getServiceHighlights, saveServiceHighlight, deleteServiceHighlight, getCategoryNameById, type Service, type Category, type ServiceHighlight } from '../../utils/adminStorage';
 import { AdminForm } from './AdminForm';
 import { DataTable } from './DataTable';
 import { SEOFormFields } from './SEOFormFields';
@@ -201,7 +200,8 @@ export function ManageServices() {
   };
 
   const handleHighlightDelete = async (highlight: ServiceHighlight) => {
-    if (confirm(`Are you sure you want to delete the highlight for "${getCategoryNameById(highlight.categoryId) || highlight.categoryId}"?`)) {
+    const categoryName = await getCategoryNameById(highlight.categoryId, categories);
+    if (confirm(`Are you sure you want to delete the highlight for "${categoryName || highlight.categoryId}"?`)) {
       try {
         await deleteServiceHighlight(highlight.categoryId);
         await loadHighlights(false);
@@ -222,13 +222,27 @@ export function ManageServices() {
     setEditingHighlight(null);
   };
 
+  const CategoryCell = ({ categoryId }: { categoryId: string }) => {
+    const [name, setName] = useState<string>(categoryId);
+    
+    useEffect(() => {
+      const loadName = async () => {
+        const categoryName = await getCategoryNameById(categoryId, categories);
+        setName(categoryName || categoryId);
+      };
+      loadName();
+    }, [categoryId, categories]);
+    
+    return <span>{name}</span>;
+  };
+
   const columns = [
     { key: 'title', label: 'Title' },
     { 
       key: 'categoryId', 
       label: 'Category',
       render: (item: Service) => (
-        <span>{getCategoryNameById(item.categoryId) || item.categoryId}</span>
+        <CategoryCell categoryId={item.categoryId} />
       )
     },
     { key: 'price', label: 'Price' },
@@ -375,7 +389,7 @@ export function ManageServices() {
                 key: 'categoryId', 
                 label: 'Category',
                 render: (item: ServiceHighlight) => (
-                  <span>{getCategoryNameById(item.categoryId) || item.categoryId}</span>
+                  <CategoryCell categoryId={item.categoryId} />
                 )
               },
               { key: 'title', label: 'Title' },

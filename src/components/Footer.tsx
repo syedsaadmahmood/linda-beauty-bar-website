@@ -1,9 +1,27 @@
 import { Phone, MapPin, Instagram, Facebook } from 'lucide-react';
 import { navigate } from './Router';
-import { categories } from '../data/data';
+import { getCategories } from '../utils/adminStorage';
+import { useState, useEffect } from 'react';
+import type { Category } from '../data/types';
 import logo from '../assets/logo-2.png';
 
 export function Footer() {
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await getCategories();
+        setCategories(data);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+        // Fallback to empty array if Supabase fails
+        setCategories([]);
+      }
+    };
+    loadCategories();
+  }, []);
+
   return (
     <footer className="bg-charcoal text-cream">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

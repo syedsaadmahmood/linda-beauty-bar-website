@@ -1,30 +1,46 @@
 import { useParams, navigate } from '../components/Router';
-import { getServices } from '../utils/adminStorage';
+import { getServices, getCategories, getCategoryNameById } from '../utils/adminStorage';
 import { ServiceDetail } from '../components/ServiceDetail';
 import { Button } from '../components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { SEO } from '../components/SEO';
 import { useState, useEffect } from 'react';
-import { getCategoryNameById } from '../data/data';
-import type { Service } from '../data/types';
+import type { Service, Category } from '../data/types';
 
 export function ServiceDetailPage() {
   const { id } = useParams('/service/:id');
   const [services, setServices] = useState<Service[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryName, setCategoryName] = useState<string>('');
   const service = services.find(s => s.id === id);
 
   useEffect(() => {
-    const loadServices = async () => {
+    const loadData = async () => {
       try {
-        const data = await getServices();
-        setServices(data);
+        const [servicesData, categoriesData] = await Promise.all([
+          getServices(),
+          getCategories(),
+        ]);
+        setServices(servicesData);
+        setCategories(categoriesData);
       } catch (error) {
-        console.error('Error loading services:', error);
+        console.error('Error loading data:', error);
         setServices([]);
+        setCategories([]);
       }
     };
-    loadServices();
+    loadData();
   }, []);
+
+  useEffect(() => {
+    const loadCategoryName = async () => {
+      if (service?.categoryId) {
+        const name = await getCategoryNameById(service.categoryId, categories);
+        setCategoryName(name || '');
+      }
+    };
+    loadCategoryName();
+  }, [service?.categoryId, categories]);
 
   if (!service) {
     return (
@@ -99,7 +115,7 @@ export function ServiceDetailPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl text-charcoal mb-2">Related Services</h2>
-            <p className="text-charcoal/70">Explore more services in {getCategoryNameById(service.categoryId) || 'this category'}</p>
+            <p className="text-charcoal/70">Explore more services in {categoryName || 'this category'}</p>
           </div>
           
           <div className="flex justify-center gap-4 flex-wrap">

@@ -1,43 +1,56 @@
 import { useState, useEffect } from 'react';
-import { getServices } from '../utils/adminStorage';
-import { categories, allCategories, getCategoryById, getCategoryIcon, getCategoryNameById } from '../data/data';
+import { getServices, getCategories, getAllCategories, getCategoryById, getCategoryIcon, getCategoryNameById } from '../utils/adminStorage';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { navigate, useSearchParams } from '../components/Router';
 import { SEO } from '../components/SEO';
+import type { Category } from '../data/types';
+import * as lucideReact from 'lucide-react';
 
 export function ServicesPage() {
   const searchParams = useSearchParams();
   const categoryIdFromUrl = searchParams.get('category');
   const [selectedCategoryName, setSelectedCategoryName] = useState('All Services');
   const [services, setServices] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [allCategories, setAllCategories] = useState<string[]>(['All Services']);
 
   useEffect(() => {
-    const loadServices = async () => {
+    const loadData = async () => {
       try {
-        const data = await getServices();
-        setServices(data);
+        const [servicesData, categoriesData] = await Promise.all([
+          getServices(),
+          getCategories(),
+        ]);
+        setServices(servicesData);
+        setCategories(categoriesData);
+        const allCats = await getAllCategories(categoriesData);
+        setAllCategories(allCats);
       } catch (error) {
-        console.error('Error loading services:', error);
-        // Show empty state on error - user should seed database first
+        console.error('Error loading data:', error);
         setServices([]);
+        setCategories([]);
+        setAllCategories(['All Services']);
       }
     };
-    loadServices();
+    loadData();
   }, []);
 
   useEffect(() => {
-    if (categoryIdFromUrl) {
-      const category = getCategoryById(categoryIdFromUrl);
-      if (category) {
-        setSelectedCategoryName(category.name);
+    const updateSelectedCategory = async () => {
+      if (categoryIdFromUrl) {
+        const category = await getCategoryById(categoryIdFromUrl, categories);
+        if (category) {
+          setSelectedCategoryName(category.name);
+        } else {
+          setSelectedCategoryName('All Services');
+        }
       } else {
         setSelectedCategoryName('All Services');
       }
-    } else {
-      setSelectedCategoryName('All Services');
-    }
-  }, [categoryIdFromUrl]);
+    };
+    updateSelectedCategory();
+  }, [categoryIdFromUrl, categories]);
 
   const handleCategoryChange = (categoryName: string) => {
     setSelectedCategoryName(categoryName);
@@ -51,11 +64,12 @@ export function ServicesPage() {
     }
   };
 
+  // Filter services synchronously using the categories we already have
   const filteredServices = selectedCategoryName === 'All Services'
     ? services
     : services.filter(service => {
-        const serviceCategoryName = getCategoryNameById(service.categoryId);
-        return serviceCategoryName === selectedCategoryName;
+        const category = categories.find(cat => cat.id === service.categoryId);
+        return category?.name === selectedCategoryName;
       });
 
   return (
@@ -95,8 +109,20 @@ export function ServicesPage() {
         {/* Services Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredServices.map((service) => {
-            const Icon = getCategoryIcon(service.categoryId);
-            const categoryName = getCategoryNameById(service.categoryId) || 'Service';
+            const category = categories.find(cat => cat.id === service.categoryId);
+            const categoryName = category?.name || 'Service';
+            
+            // Get icon component synchronously
+            let Icon: any = lucideReact.Droplet;
+            if (category) {
+              if (typeof category.icon === 'string') {
+                const iconName = category.icon.trim();
+                Icon = (lucideReact as any)[iconName] || lucideReact.Droplet;
+              } else {
+                Icon = category.icon;
+              }
+            }
+
             return (
               <Card 
                 key={service.id} 

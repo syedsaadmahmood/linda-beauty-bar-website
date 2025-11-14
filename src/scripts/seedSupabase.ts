@@ -220,7 +220,10 @@ Steps:
 
     // Seed Service Highlights
     console.log('Seeding service highlights...');
-    const highlightRows = serviceHighlights.map(serviceHighlightToDbRow);
+    const highlightRows = serviceHighlights.map((highlight, index) => ({
+      ...serviceHighlightToDbRow(highlight),
+      display_order: index, // Preserve order from data.ts
+    }));
     const { error: highlightsError } = await supabase
       .from(TABLES.serviceHighlights)
       .upsert(highlightRows, { onConflict: 'id' });

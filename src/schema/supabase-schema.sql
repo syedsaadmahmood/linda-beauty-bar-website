@@ -120,6 +120,7 @@ CREATE TABLE IF NOT EXISTS service_highlights (
   title TEXT NOT NULL,
   description TEXT NOT NULL,
   icon_name TEXT NOT NULL,
+  display_order INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

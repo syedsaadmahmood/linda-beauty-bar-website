@@ -2,27 +2,31 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { navigate } from './Router';
-import { getServiceHighlights } from '../utils/adminStorage';
-import { getCategoryNameById } from '../data/data';
-import type { ServiceHighlight } from '../data/types';
+import { getServiceHighlights, getCategories } from '../utils/adminStorage';
+import type { ServiceHighlight, Category } from '../data/types';
 
 export function ServicesOverview() {
   const [highlights, setHighlights] = useState<ServiceHighlight[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadHighlights();
+    loadData();
   }, []);
 
-  const loadHighlights = async () => {
+  const loadData = async () => {
     try {
       setIsLoading(true);
-      const data = await getServiceHighlights();
-      setHighlights(data);
+      const [highlightsData, categoriesData] = await Promise.all([
+        getServiceHighlights(),
+        getCategories(),
+      ]);
+      setHighlights(highlightsData);
+      setCategories(categoriesData);
     } catch (error) {
-      console.error('Error loading service highlights:', error);
-      // Fallback to empty array if Supabase fails
+      console.error('Error loading data:', error);
       setHighlights([]);
+      setCategories([]);
     } finally {
       setIsLoading(false);
     }
@@ -77,7 +81,8 @@ export function ServicesOverview() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {highlights.map((highlight) => {
             const Icon = highlight.icon;
-            const categoryName = getCategoryNameById(highlight.categoryId) || 'Service';
+            const category = categories.find(cat => cat.id === highlight.categoryId);
+            const categoryName = category?.name || 'Service';
             return (
               <Card 
                 key={highlight.categoryId} 
