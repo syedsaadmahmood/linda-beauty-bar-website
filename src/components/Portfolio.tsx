@@ -38,7 +38,7 @@ export function Portfolio() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-5 mb-8">
+          <TabsList className="flex w-full max-w-2xl mx-auto justify-between mb-8">
             <TabsTrigger value="all">All</TabsTrigger>
             {categories.map(cat => (
               <TabsTrigger key={cat.id} value={cat.id}>{cat.name}</TabsTrigger>

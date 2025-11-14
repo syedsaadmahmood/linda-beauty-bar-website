@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, X, Phone, Mail } from 'lucide-react';
+import { Menu, X, Phone } from 'lucide-react';
 import { Button } from './ui/button';
 import { navigate } from './Router';
 import logo from '../assets/logo-1.png';
@@ -16,11 +16,7 @@ export function Header() {
             <div className="flex items-center gap-4">
               <a href="tel:+1234567890" className="flex items-center gap-2 text-charcoal hover:text-blush-pink transition-colors cursor-pointer">
                 <Phone className="w-4 h-4" />
-                <span className="hidden sm:inline">(123) 456-7890</span>
-              </a>
-              <a href="mailto:info@lindasbeautybar.com" className="flex items-center gap-2 text-charcoal hover:text-blush-pink transition-colors cursor-pointer">
-                <Mail className="w-4 h-4" />
-                <span className="hidden sm:inline">info@lindasbeautybar.com</span>
+                <span className="hidden sm:inline">(512) 817-9598</span>
               </a>
             </div>
             <div className="text-charcoal">
@@ -34,13 +30,13 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <button 
-              onClick={() => navigate('/')} 
+            <button
+              onClick={() => navigate('/')}
               className="hover:opacity-80 transition-opacity cursor-pointer"
             >
-              <img 
-                src={logo} 
-                alt="Linda's Beauty Bar - Permanent Makeup" 
+              <img
+                src={logo}
+                alt="Linda's Beauty Bar - Permanent Makeup"
                 className="h-16 sm:h-20 w-auto object-contain"
                 style={{ maxWidth: '200px' }}
               />
@@ -64,9 +60,9 @@ export function Header() {
             <button onClick={() => { navigate('/'); setTimeout(() => document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="text-charcoal hover:text-blush-pink transition-colors cursor-pointer">
               FAQ
             </button>
-            <a 
-              href="https://lindasbeautyacademy.com" 
-              target="_blank" 
+            <a
+              href="https://lindasbeautyacademy.com"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-charcoal hover:text-blush-pink transition-colors cursor-pointer"
             >
@@ -107,9 +103,9 @@ export function Header() {
               <button onClick={() => { navigate('/'); setMobileMenuOpen(false); setTimeout(() => document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="text-charcoal hover:text-blush-pink transition-colors text-left cursor-pointer">
                 FAQ
               </button>
-              <a 
-                href="https://lindasbeautyacademy.com" 
-                target="_blank" 
+              <a
+                href="https://lindasbeautyacademy.com"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-charcoal hover:text-blush-pink transition-colors cursor-pointer"
                 onClick={() => setMobileMenuOpen(false)}

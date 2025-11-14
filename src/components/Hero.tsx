@@ -11,10 +11,12 @@ export function Hero() {
           {/* Content */}
           <div className="space-y-6">
             <h1 className="text-5xl lg:text-6xl text-charcoal">
-              Wake Up Beautiful, Every Day
+              Wake Up Beautiful Effortlessly,
+              <br />
+              Every Day
             </h1>
             <p className="text-xl text-charcoal/80">
-              Expert permanent makeup services including microblading, powder brows, eyeliner, and lip blush. 
+              Expert permanent makeup services including microblading, powder brows, eyeliner, and lip blush.
               Enhance your natural beauty with our certified specialists.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -27,19 +29,19 @@ export function Hero() {
                 View Services
               </Button>
             </div>
-            
+
             {/* Stats */}
             <div className="grid grid-cols-3 gap-8 pt-8 border-t border-blush-pink">
               <div>
-                <div className="text-3xl text-blush-pink">10+</div>
+                <div className="text-3xl text-blush-pink">6+</div>
                 <div className="text-sm text-charcoal/70">Years Experience</div>
               </div>
               <div>
-                <div className="text-3xl text-blush-pink">5000+</div>
+                <div className="text-3xl text-blush-pink">100+</div>
                 <div className="text-sm text-charcoal/70">Happy Clients</div>
               </div>
               <div>
-                <div className="text-3xl text-blush-pink">500+</div>
+                <div className="text-3xl text-blush-pink">20+</div>
                 <div className="text-sm text-charcoal/70">5-Star Reviews</div>
               </div>
             </div>
