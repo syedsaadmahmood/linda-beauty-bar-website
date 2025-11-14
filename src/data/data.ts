@@ -1245,14 +1245,14 @@ export const categories: Category[] = [
     icon: Smile,
   },
   {
-    id: 'lash-extensions',
-    name: 'Lash Extensions',
-    icon: Eye,
-  },
-  {
     id: 'paramedical-tattoo',
     name: 'Paramedical Tattoo',
     icon: Heart,
+  },
+  {
+    id: 'lash-extensions',
+    name: 'Lash Extensions',
+    icon: Eye,
   },
   {
     id: 'body-sculpting',

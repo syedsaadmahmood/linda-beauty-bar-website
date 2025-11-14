@@ -13,7 +13,7 @@ const achievements = [
   },
   {
     icon: Users,
-    title: '5000+ Happy Clients',
+    title: '100+ Happy Clients',
     description: 'Over a decade of experience creating natural, beautiful results',
   },
   {

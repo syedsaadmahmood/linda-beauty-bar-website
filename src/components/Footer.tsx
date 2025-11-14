@@ -1,4 +1,4 @@
-import { Phone, Mail, MapPin, Instagram, Facebook } from 'lucide-react';
+import { Phone, MapPin, Instagram, Facebook } from 'lucide-react';
 import { navigate } from './Router';
 import { categories } from '../data/data';
 import logo from '../assets/logo-2.png';
@@ -11,10 +11,10 @@ export function Footer() {
           {/* About */}
           <div>
             <button onClick={() => navigate('/')} className="hover:opacity-80 transition-opacity mb-4 block cursor-pointer">
-              <img 
-                src={logo} 
-                alt="Linda's Beauty Bar - Permanent Makeup" 
-                className="h-16 w-auto brightness-0 invert object-contain"
+              <img
+                src={logo}
+                alt="Linda's Beauty Bar - Permanent Makeup"
+                className="h-16 w-auto   object-contain"
                 style={{ maxWidth: '180px' }}
               />
             </button>
@@ -49,8 +49,8 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               {categories.map((category) => (
                 <li key={category.id}>
-                  <button 
-                    onClick={() => navigate(`/services?category=${category.id}`)} 
+                  <button
+                    onClick={() => navigate(`/services?category=${category.id}`)}
                     className="hover:text-blush-pink transition-colors text-cream/80 text-left cursor-pointer"
                   >
                     {category.name}
@@ -66,16 +66,13 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2 text-cream/80">
                 <MapPin className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                <span>123 Beauty Lane<br />Los Angeles, CA 90210</span>
+                <span>3835 Co Rd 175 #510<br />Leander, TX 78641</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="w-5 h-5 flex-shrink-0" />
-                <a href="tel:+1234567890" className="hover:text-blush-pink transition-colors text-cream/80 cursor-pointer">(123) 456-7890</a>
+                <a href="tel:+5128179578" className="hover:text-blush-pink transition-colors text-cream/80 cursor-pointer">(512) 817-9578</a>
               </li>
-              <li className="flex items-center gap-2">
-                <Mail className="w-5 h-5 flex-shrink-0" />
-                <a href="mailto:info@lindasbeautybar.com" className="hover:text-blush-pink transition-colors text-cream/80 cursor-pointer">info@lindasbeautybar.com</a>
-              </li>
+
             </ul>
           </div>
         </div>

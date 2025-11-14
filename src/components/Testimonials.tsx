@@ -31,14 +31,16 @@ export function Testimonials() {
 
         <div className="grid md:grid-cols-2 gap-8">
           {testimonials.map((testimonial) => (
-            <Card key={testimonial.id} className="bg-white border-blush-pink-light/30">
-              <CardContent className="pt-6">
+            <Card key={testimonial.id} className="bg-white border-blush-pink-light/30 h-full flex flex-col">
+              <CardContent className="pt-6 flex flex-col flex-1">
                 <div className="flex gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 fill-blush-pink text-blush-pink" />
                   ))}
                 </div>
-                <p className="text-charcoal/80 mb-4 italic">"{testimonial.text}"</p>
+                <div className="flex-1 min-h-[120px] mb-4">
+                  <p className="text-charcoal/80 italic">"{testimonial.text}"</p>
+                </div>
                 <div className="flex justify-between items-center pt-4 border-t border-blush-pink-light/50">
                   <div>
                     <div className="text-charcoal">{testimonial.name}</div>
@@ -55,7 +57,7 @@ export function Testimonials() {
           <div className="inline-block bg-white rounded-lg shadow-md px-8 py-6">
             <div className="flex items-center justify-center gap-6">
               <div className="text-center">
-                <div className="text-4xl text-blush-pink">4.9</div>
+                <div className="text-4xl text-blush-pink">5.0</div>
                 <div className="flex gap-1 mt-1 justify-center">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-blush-pink text-blush-pink" />
@@ -65,7 +67,7 @@ export function Testimonials() {
               </div>
               <div className="h-12 w-px bg-charcoal/20"></div>
               <div className="text-center">
-                <div className="text-4xl text-blush-pink">500+</div>
+                <div className="text-4xl text-blush-pink">20+</div>
                 <div className="text-sm text-charcoal/70 mt-1">5-Star Reviews</div>
               </div>
             </div>
