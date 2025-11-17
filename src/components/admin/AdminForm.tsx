@@ -39,19 +39,41 @@ export function AdminForm({
           <CardTitle>{title}</CardTitle>
           {description && <CardDescription>{description}</CardDescription>}
         </div>
-        <Button
-          type="button"
-          onClick={handleTopSave}
-          className="bg-blush-pink hover:bg-blush-pink-dark text-charcoal"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Saving...' : submitLabel}
-        </Button>
+        <div className="flex gap-2">
+          {onCancel && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isLoading}
+            >
+              {cancelLabel}
+            </Button>
+          )}
+          <Button
+            type="button"
+            onClick={handleTopSave}
+            className="bg-blush-pink hover:bg-blush-pink-dark text-charcoal"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Saving...' : submitLabel}
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="p-6">
         <form ref={formRef} onSubmit={onSubmit} className="space-y-6">
           {children}
           <div className="flex justify-end gap-4 pt-6 mt-6 border-t border-gray-200">
+            {onCancel && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                disabled={isLoading}
+              >
+                {cancelLabel}
+              </Button>
+            )}
             <Button
               type="submit"
               className="bg-blush-pink hover:bg-blush-pink-dark text-charcoal"
