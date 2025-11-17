@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getTestimonials, saveTestimonial, deleteTestimonial, type Testimonial } from '../../utils/adminStorage';
+import { getTestimonials, saveTestimonial, deleteTestimonial, updateSortOrder, type Testimonial } from '../../utils/adminStorage';
 import { AdminForm } from './AdminForm';
-import { DataTable } from './DataTable';
+import { SortableDataTable } from './SortableDataTable';
 import { SEOFormFields } from './SEOFormFields';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -61,6 +61,11 @@ export function ManageTestimonials() {
     setEditingTestimonial(null);
   };
 
+  const handleReorder = async (reorderedTestimonials: Testimonial[]) => {
+    await updateSortOrder('testimonials', reorderedTestimonials);
+    await loadTestimonials();
+  };
+
   const columns = [
     { key: 'name', label: 'Name' },
     { key: 'service', label: 'Service' },
@@ -100,11 +105,12 @@ export function ManageTestimonials() {
         </div>
       </div>
 
-      <DataTable
-        data={testimonials}
+      <SortableDataTable
+        data={testimonials.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))}
         columns={columns}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onReorder={handleReorder}
         keyExtractor={(t) => t.id}
       />
     </div>

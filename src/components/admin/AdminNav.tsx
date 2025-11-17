@@ -20,7 +20,7 @@ const navigationItems: NavigationItem[] = [
   { id: 'faq', label: 'FAQ', icon: HelpCircle },
   { id: 'portfolio', label: 'Portfolio', icon: Image },
   { id: 'seo', label: 'SEO Settings', icon: Tags },
-  { id: 'seed', label: 'Seed Data', icon: Database },
+  // { id: 'seed', label: 'Seed Data', icon: Database },
 ];
 
 export function AdminNav({ currentSection = 'dashboard', onNavigate, onLogout }: AdminNavProps) {

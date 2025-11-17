@@ -141,7 +141,7 @@ export function SEOSettings() {
           </CardContent>
         </Card>
 
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Reset to Defaults</CardTitle>
             <CardDescription>
@@ -158,7 +158,7 @@ export function SEOSettings() {
               Clear All Data
             </Button>
           </CardContent>
-        </Card>
+        </Card> */}
 
         <Card>
           <CardHeader>

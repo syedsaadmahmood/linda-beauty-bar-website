@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getFAQCategories, saveFAQCategory, deleteFAQCategory, type FAQCategory } from '../../utils/adminStorage';
+import { getFAQCategories, saveFAQCategory, deleteFAQCategory, updateSortOrder, type FAQCategory } from '../../utils/adminStorage';
 import { AdminForm } from './AdminForm';
+import { SortableDataTable } from './SortableDataTable';
 import { SEOFormFields } from './SEOFormFields';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -8,6 +9,24 @@ import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import { Plus, X, Edit, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { GripVertical } from 'lucide-react';
 
 export function ManageFAQ() {
   const [categories, setCategories] = useState<FAQCategory[]>([]);
@@ -61,6 +80,11 @@ export function ManageFAQ() {
     setEditingCategory(null);
   };
 
+  const handleCategoriesReorder = async (reorderedCategories: FAQCategory[]) => {
+    await updateSortOrder('faq', reorderedCategories);
+    await loadCategories();
+  };
+
   if (isFormOpen) {
     return (
       <FAQForm
@@ -89,58 +113,27 @@ export function ManageFAQ() {
         </div>
       </div>
 
-      <div className="space-y-4">
-        {categories.map((category) => (
-          <Card key={category.category}>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>{category.category}</CardTitle>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleEdit(category)}
-                    className="text-blue-600"
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(category)}
-                    className="text-red-600"
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
-                  </Button>
+      <SortableDataTable
+        data={categories.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))}
+        columns={[
+          { 
+            key: 'category', 
+            label: 'Category',
+            render: (item: FAQCategory) => (
+              <div>
+                <div className="font-semibold">{item.category}</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {item.questions.length} question{item.questions.length !== 1 ? 's' : ''}
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {category.questions.map((q) => (
-                  <div key={q.id} className="p-3 bg-gray-50 rounded-lg">
-                    <h4 className="font-medium text-charcoal mb-1">{q.question}</h4>
-                    <p className="text-sm text-gray-600">{q.answer}</p>
-                  </div>
-                ))}
-                {category.questions.length === 0 && (
-                  <p className="text-sm text-gray-500">No questions in this category</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-        {categories.length === 0 && (
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-12">
-            <div className="text-center text-gray-500">
-              <p className="text-base">No FAQ categories found.</p>
-              <p className="text-sm mt-1">Add your first category to get started.</p>
-            </div>
-          </div>
-        )}
-      </div>
+            )
+          },
+        ]}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onReorder={handleCategoriesReorder}
+        keyExtractor={(c) => c.category}
+      />
     </div>
   );
 }
@@ -149,6 +142,72 @@ interface FAQFormProps {
   category?: FAQCategory | null;
   onSave: (category: FAQCategory) => void;
   onCancel: () => void;
+}
+
+function SortableQuestionItem({ question, index, onQuestionChange, onRemove }: {
+  question: { id: string; question: string; answer: string };
+  index: number;
+  onQuestionChange: (index: number, field: 'question' | 'answer', value: string) => void;
+  onRemove: (index: number) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: question.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`p-4 border rounded-lg space-y-3 ${isDragging ? 'bg-gray-100' : ''}`}
+    >
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <button
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600"
+            aria-label="Drag to reorder"
+          >
+            <GripVertical className="w-4 h-4" />
+          </button>
+          <h4 className="font-medium">Question #{index + 1}</h4>
+        </div>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => onRemove(index)}
+          className="text-red-600"
+        >
+          <X className="w-4 h-4" />
+        </Button>
+      </div>
+      <div className="space-y-2">
+        <Input
+          placeholder="Question"
+          value={question.question}
+          onChange={(e) => onQuestionChange(index, 'question', e.target.value)}
+        />
+        <Textarea
+          placeholder="Answer"
+          value={question.answer}
+          onChange={(e) => onQuestionChange(index, 'answer', e.target.value)}
+          rows={3}
+        />
+      </div>
+    </div>
+  );
 }
 
 function FAQForm({ category, onSave, onCancel }: FAQFormProps) {
@@ -162,6 +221,30 @@ function FAQForm({ category, onSave, onCancel }: FAQFormProps) {
       setFormData(category);
     }
   }, [category]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = formData.questions.findIndex((q) => q.id === active.id);
+      const newIndex = formData.questions.findIndex((q) => q.id === over.id);
+
+      setFormData((prev) => ({
+        ...prev,
+        questions: arrayMove(prev.questions, oldIndex, newIndex).map((q, index) => ({
+          ...q,
+          sort_order: index,
+        })),
+      }));
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -225,35 +308,26 @@ function FAQForm({ category, onSave, onCancel }: FAQFormProps) {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {formData.questions.map((q, index) => (
-              <div key={q.id} className="p-4 border rounded-lg space-y-3">
-                <div className="flex justify-between items-center">
-                  <h4 className="font-medium">Question #{index + 1}</h4>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeQuestion(index)}
-                    className="text-red-600"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="space-y-2">
-                  <Input
-                    placeholder="Question"
-                    value={q.question}
-                    onChange={(e) => handleQuestionChange(index, 'question', e.target.value)}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={formData.questions.map((q) => q.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {formData.questions.map((q, index) => (
+                  <SortableQuestionItem
+                    key={q.id}
+                    question={q}
+                    index={index}
+                    onQuestionChange={handleQuestionChange}
+                    onRemove={removeQuestion}
                   />
-                  <Textarea
-                    placeholder="Answer"
-                    value={q.answer}
-                    onChange={(e) => handleQuestionChange(index, 'answer', e.target.value)}
-                    rows={3}
-                  />
-                </div>
-              </div>
-            ))}
+                ))}
+              </SortableContext>
+            </DndContext>
             {formData.questions.length === 0 && (
               <p className="text-sm text-gray-500 text-center py-4">No questions added yet</p>
             )}

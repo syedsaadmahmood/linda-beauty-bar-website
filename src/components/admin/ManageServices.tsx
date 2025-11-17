@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getServices, saveService, deleteService, getCategories, saveCategory, deleteCategory, getServiceHighlights, saveServiceHighlight, deleteServiceHighlight, getCategoryNameById, type Service, type Category, type ServiceHighlight } from '../../utils/adminStorage';
+import { getServices, saveService, deleteService, getCategories, saveCategory, deleteCategory, getServiceHighlights, saveServiceHighlight, deleteServiceHighlight, getCategoryNameById, updateSortOrder, type Service, type Category, type ServiceHighlight } from '../../utils/adminStorage';
 import { AdminForm } from './AdminForm';
-import { DataTable } from './DataTable';
+import { SortableDataTable } from './SortableDataTable';
 import { SEOFormFields } from './SEOFormFields';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Button } from '../ui/button';
@@ -222,6 +222,91 @@ export function ManageServices() {
     setEditingHighlight(null);
   };
 
+  const handleServicesReorder = async (reorderedServices: Service[]) => {
+    // For per-category sorting, group services by category and batch update each category
+    const servicesByCategory = new Map<string, Service[]>();
+    
+    // Group services by their category
+    for (const service of reorderedServices) {
+      if (!servicesByCategory.has(service.categoryId)) {
+        servicesByCategory.set(service.categoryId, []);
+      }
+      servicesByCategory.get(service.categoryId)!.push(service);
+    }
+    
+    // Batch update each category's services
+    const updatePromises = Array.from(servicesByCategory.entries()).map(([categoryId, categoryServices]) => {
+      const servicesWithOrder = categoryServices.map((service, index) => ({
+        ...service,
+        sort_order: index,
+      }));
+      return updateSortOrder('services', servicesWithOrder, categoryId);
+    });
+    
+    await Promise.all(updatePromises);
+    await loadServices();
+  };
+
+  const handleCategoriesReorder = async (reorderedCategories: Category[]) => {
+    await updateSortOrder('categories', reorderedCategories);
+    await loadCategories(false);
+  };
+
+  const handleHighlightsReorder = async (reorderedHighlights: ServiceHighlight[]) => {
+    // ServiceHighlight uses categoryId as the key, but we can batch update using updateSortOrder
+    // Convert highlights to format with id for batch update
+    const highlightsForBatch = reorderedHighlights.map((h, index) => ({
+      id: `highlight-${h.categoryId}`,
+      sort_order: index,
+      categoryId: h.categoryId,
+      title: h.title,
+      description: h.description,
+      icon: h.icon,
+    })) as any[];
+    
+    // Use batch update - fetch existing, merge, then batch upsert
+    const { supabase } = await import('../../lib/supabase');
+    const ids = highlightsForBatch.map(h => h.id);
+    
+    const { data: existingHighlights, error: fetchError } = await supabase
+      .from('service_highlights')
+      .select('*')
+      .in('id', ids);
+    
+    if (fetchError) throw fetchError;
+    if (!existingHighlights || existingHighlights.length === 0) {
+      await loadHighlights(false);
+      return;
+    }
+    
+    // Create sort order map
+    const sortOrderMap = new Map<string, number>();
+    highlightsForBatch.forEach((h, index) => {
+      sortOrderMap.set(h.id, index);
+    });
+    
+    // Merge existing data with new sort_order
+    const updatedHighlights = existingHighlights.map((record: any) => {
+      const newSortOrder = sortOrderMap.get(record.id);
+      if (newSortOrder !== undefined) {
+        return {
+          ...record,
+          sort_order: newSortOrder,
+          updated_at: new Date().toISOString(),
+        };
+      }
+      return record;
+    });
+    
+    // Batch upsert all highlights
+    const { error: upsertError } = await supabase
+      .from('service_highlights')
+      .upsert(updatedHighlights, { onConflict: 'id' });
+    
+    if (upsertError) throw upsertError;
+    await loadHighlights(false);
+  };
+
   const CategoryCell = ({ categoryId }: { categoryId: string }) => {
     const [name, setName] = useState<string>(categoryId);
     
@@ -322,11 +407,18 @@ export function ManageServices() {
           </div>
 
 
-          <DataTable
-            data={services}
+          <SortableDataTable
+            data={services.sort((a, b) => {
+              // Sort by category first, then by sort_order within category
+              if (a.categoryId !== b.categoryId) {
+                return a.categoryId.localeCompare(b.categoryId);
+              }
+              return (a.sort_order ?? 0) - (b.sort_order ?? 0);
+            })}
             columns={columns}
             onEdit={handleServiceEdit}
             onDelete={handleDelete}
+            onReorder={handleServicesReorder}
             keyExtractor={(s) => s.id}
           />
         </TabsContent>
@@ -352,11 +444,12 @@ export function ManageServices() {
             </p>
           </div>
 
-          <DataTable
-            data={categories}
+          <SortableDataTable
+            data={categories.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))}
             columns={categoryColumns}
             onEdit={handleCategoryEdit}
             onDelete={handleCategoryDelete}
+            onReorder={handleCategoriesReorder}
             keyExtractor={(c) => c.id}
           />
         </TabsContent>
@@ -382,8 +475,8 @@ export function ManageServices() {
             </p>
           </div>
 
-          <DataTable
-            data={highlights}
+          <SortableDataTable
+            data={highlights.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))}
             columns={[
               { 
                 key: 'categoryId', 
@@ -397,6 +490,7 @@ export function ManageServices() {
             ]}
             onEdit={handleHighlightEdit}
             onDelete={handleHighlightDelete}
+            onReorder={handleHighlightsReorder}
             keyExtractor={(h) => h.categoryId}
           />
         </TabsContent>

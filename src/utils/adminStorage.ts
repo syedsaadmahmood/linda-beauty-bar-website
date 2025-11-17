@@ -33,6 +33,7 @@ function dbRowToService(row: any): Service {
     process: row.process || [],
     aftercare: row.aftercare || [],
     faqs: row.faqs || [],
+    sort_order: row.sort_order ?? 0,
     metaTitle: row.meta_title,
     metaDescription: row.meta_description,
     metaKeywords: row.meta_keywords,
@@ -60,6 +61,7 @@ function serviceToDbRow(service: Service): any {
     process: service.process || [],
     aftercare: service.aftercare || [],
     faqs: service.faqs || [],
+    sort_order: service.sort_order ?? 0,
     meta_title: service.metaTitle || null,
     meta_description: service.metaDescription || null,
     meta_keywords: service.metaKeywords || null,
@@ -84,7 +86,8 @@ export async function getServices(useCache = true): Promise<Service[]> {
     const { data, error } = await supabase
       .from(TABLES.services)
       .select('*')
-      .order('title', { ascending: true });
+      .order('sort_order', { ascending: true })
+      .order('title', { ascending: true }); // Fallback ordering
 
     if (error) {
       console.error('Error fetching services from Supabase:', error);
@@ -162,6 +165,7 @@ function dbRowToTestimonial(row: any): Testimonial {
     rating: row.rating,
     text: row.text,
     date: row.date,
+    sort_order: row.sort_order ?? 0,
     metaTitle: row.meta_title,
     metaDescription: row.meta_description,
     metaKeywords: row.meta_keywords,
@@ -180,6 +184,7 @@ function testimonialToDbRow(testimonial: Testimonial): any {
     rating: testimonial.rating,
     text: testimonial.text,
     date: testimonial.date,
+    sort_order: testimonial.sort_order ?? 0,
     meta_title: testimonial.metaTitle || null,
     meta_description: testimonial.metaDescription || null,
     meta_keywords: testimonial.metaKeywords || null,
@@ -203,7 +208,8 @@ export async function getTestimonials(useCache = true): Promise<Testimonial[]> {
     const { data, error } = await supabase
       .from(TABLES.testimonials)
       .select('*')
-      .order('date', { ascending: false });
+      .order('sort_order', { ascending: true })
+      .order('date', { ascending: false }); // Fallback ordering
 
     if (error) {
       console.error('Error fetching testimonials from Supabase:', error);
@@ -233,6 +239,7 @@ export async function saveTestimonial(testimonial: Testimonial): Promise<Testimo
       rating: testimonial.rating,
       text: testimonial.text,
       date: testimonial.date,
+      sort_order: testimonial.sort_order ?? 0,
       meta_title: testimonial.metaTitle || null,
       meta_description: testimonial.metaDescription || null,
       meta_keywords: testimonial.metaKeywords || null,
@@ -328,7 +335,8 @@ export async function getFAQCategories(useCache = true): Promise<FAQCategory[]> 
     const { data: categories, error: categoriesError } = await supabase
       .from('faq_categories')
       .select('*')
-      .order('category', { ascending: true });
+      .order('sort_order', { ascending: true })
+      .order('category', { ascending: true }); // Fallback ordering
 
     if (categoriesError) throw categoriesError;
 
@@ -336,7 +344,8 @@ export async function getFAQCategories(useCache = true): Promise<FAQCategory[]> 
     const { data: items, error: itemsError } = await supabase
       .from('faq_items')
       .select('*')
-      .order('id', { ascending: true });
+      .order('sort_order', { ascending: true })
+      .order('id', { ascending: true }); // Fallback ordering
 
     if (itemsError) throw itemsError;
 
@@ -348,11 +357,13 @@ export async function getFAQCategories(useCache = true): Promise<FAQCategory[]> 
           id: item.id,
           question: item.question,
           answer: item.answer,
+          sort_order: item.sort_order ?? 0,
         }));
 
       return {
         category: cat.category,
         questions: categoryItems,
+        sort_order: cat.sort_order ?? 0,
         metaTitle: cat.meta_title,
         metaDescription: cat.meta_description,
         metaKeywords: cat.meta_keywords,
@@ -381,6 +392,7 @@ export async function saveFAQCategory(faqCategory: FAQCategory): Promise<void> {
       .from('faq_categories')
       .upsert({
         category: faqCategory.category,
+        sort_order: faqCategory.sort_order ?? 0,
         meta_title: faqCategory.metaTitle || null,
         meta_description: faqCategory.metaDescription || null,
         meta_keywords: faqCategory.metaKeywords || null,
@@ -410,6 +422,7 @@ export async function saveFAQCategory(faqCategory: FAQCategory): Promise<void> {
         faq_category_id: categoryId,
         question: item.question,
         answer: item.answer,
+        sort_order: item.sort_order ?? 0,
         updated_at: new Date().toISOString(),
       }));
 
@@ -482,7 +495,8 @@ export async function getPortfolioCategories(useCache = true): Promise<Portfolio
     const { data, error } = await supabase
       .from(TABLES.portfolioCategories)
       .select('*')
-      .order('name', { ascending: true });
+      .order('sort_order', { ascending: true })
+      .order('name', { ascending: true }); // Fallback ordering
 
     if (error) {
       console.error('Error fetching portfolio categories from Supabase:', error);
@@ -492,6 +506,7 @@ export async function getPortfolioCategories(useCache = true): Promise<Portfolio
     const categories = (data || []).map((row: any) => ({
       id: row.id,
       name: row.name,
+      sort_order: row.sort_order ?? 0,
     }));
 
     if (useCache) {
@@ -512,6 +527,7 @@ export async function savePortfolioCategory(category: PortfolioCategory): Promis
       .upsert({
         id: category.id,
         name: category.name,
+        sort_order: category.sort_order ?? 0,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'id' });
 
@@ -553,7 +569,8 @@ export async function getPortfolio(useCache = true): Promise<Portfolio[]> {
     const { data, error } = await supabase
       .from(TABLES.portfolio)
       .select('*')
-      .order('id', { ascending: true });
+      .order('sort_order', { ascending: true })
+      .order('id', { ascending: true }); // Fallback ordering
 
     if (error) {
       console.error('Error fetching portfolio from Supabase:', error);
@@ -566,6 +583,7 @@ export async function getPortfolio(useCache = true): Promise<Portfolio[]> {
       title: row.title,
       alt: row.alt,
       imageUrl: row.image_url,
+      sort_order: row.sort_order ?? 0,
       metaTitle: row.meta_title,
       metaDescription: row.meta_description,
       metaKeywords: row.meta_keywords,
@@ -595,6 +613,7 @@ export async function savePortfolioItem(item: Portfolio): Promise<Portfolio> {
       title: item.title,
       alt: item.alt,
       image_url: item.imageUrl,
+      sort_order: item.sort_order ?? 0,
       meta_title: item.metaTitle || null,
       meta_description: item.metaDescription || null,
       meta_keywords: item.metaKeywords || null,
@@ -642,6 +661,7 @@ export async function savePortfolioItem(item: Portfolio): Promise<Portfolio> {
       title: data.title,
       alt: data.alt,
       imageUrl: data.image_url,
+      sort_order: data.sort_order ?? 0,
       metaTitle: data.meta_title,
       metaDescription: data.meta_description,
       metaKeywords: data.meta_keywords,
@@ -717,7 +737,8 @@ export async function getCategories(useCache = true): Promise<Category[]> {
     const { data, error } = await supabase
       .from(TABLES.categories)
       .select('*')
-      .order('name', { ascending: true });
+      .order('sort_order', { ascending: true })
+      .order('name', { ascending: true }); // Fallback ordering
 
     if (error) {
       console.error('Error fetching categories from Supabase:', error);
@@ -756,6 +777,7 @@ export async function getCategories(useCache = true): Promise<Category[]> {
         name: row.name,
         icon: iconName, // Store as string - will be converted to component when rendering
         _iconName: iconName, // Store original name for reference (redundant but helpful)
+        sort_order: row.sort_order ?? 0,
       };
     });
 
@@ -819,6 +841,7 @@ export async function saveCategory(category: Category): Promise<void> {
         id: category.id,
         name: category.name,
         icon_name: finalIconName,
+        sort_order: category.sort_order ?? 0,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'id' });
 
@@ -892,6 +915,7 @@ async function dbRowToServiceHighlight(row: any): Promise<ServiceHighlight> {
     description: row.description,
     icon: Icon,
     _iconName: iconName, // Store icon name for cache serialization
+    sort_order: row.sort_order ?? (row.display_order ?? 0), // Support both sort_order and display_order during migration
   };
   
   return highlight;
@@ -930,7 +954,7 @@ function serviceHighlightToDbRow(highlight: ServiceHighlight): any {
     title: highlight.title,
     description: highlight.description,
     icon_name: iconName,
-    display_order: (highlight as any).display_order ?? 0, // Preserve order if provided
+    sort_order: highlight.sort_order ?? 0,
     updated_at: new Date().toISOString(),
   };
 }
@@ -978,7 +1002,8 @@ export async function getServiceHighlights(useCache = true): Promise<ServiceHigh
     const { data, error } = await supabase
       .from(TABLES.serviceHighlights)
       .select('*')
-      .order('display_order', { ascending: true });
+      .order('sort_order', { ascending: true })
+      .order('display_order', { ascending: true }); // Fallback for migration period
 
     if (error) {
       console.error('Error fetching service highlights from Supabase:', error);
@@ -995,6 +1020,7 @@ export async function getServiceHighlights(useCache = true): Promise<ServiceHigh
         description: h.description,
         icon: typeof h.icon === 'string' ? h.icon : (h._iconName || 'Droplet'),
         _iconName: typeof h.icon === 'string' ? h.icon : (h._iconName || 'Droplet'),
+        sort_order: h.sort_order ?? 0,
       }));
       setCache(CACHE_KEYS.serviceHighlights, highlightsForCache, { ttl: CACHE_TTL.serviceHighlights });
     }
@@ -1112,6 +1138,88 @@ export async function resetToDefaults(): Promise<void> {
     Object.values(CACHE_KEYS).forEach(key => removeCache(key));
   } catch (error) {
     console.error('Error resetting data:', error);
+    throw error;
+  }
+}
+
+// Batch update sort order for drag-and-drop reordering
+export async function updateSortOrder<T extends { id: string | number; sort_order?: number }>(
+  tableName: keyof typeof TABLES,
+  items: T[],
+  categoryId?: string // For per-category sorting (services, portfolio items, FAQ items)
+): Promise<void> {
+  try {
+    const table = TABLES[tableName];
+    
+    if (items.length === 0) return;
+    
+    // Extract IDs to update
+    const ids = items.map(item => item.id);
+    
+    // Fetch existing records in one query to get all required fields
+    let query = supabase
+      .from(table)
+      .select('*')
+      .in('id', ids);
+    
+    // For per-category sorting, filter by category
+    if (categoryId) {
+      if (tableName === 'services' || tableName === 'portfolio') {
+        query = query.eq('category_id', categoryId);
+      }
+    }
+    
+    const { data: existingRecords, error: fetchError } = await query;
+    
+    if (fetchError) throw fetchError;
+    if (!existingRecords || existingRecords.length === 0) {
+      console.warn(`No records found to update for ${tableName}`);
+      return;
+    }
+    
+    // Create a map of new sort orders
+    const sortOrderMap = new Map<string | number, number>();
+    items.forEach((item, index) => {
+      sortOrderMap.set(item.id, index);
+    });
+    
+    // Merge existing records with new sort_order values
+    const updatedRecords = existingRecords.map((record: any) => {
+      const newSortOrder = sortOrderMap.get(record.id);
+      if (newSortOrder !== undefined) {
+        return {
+          ...record,
+          sort_order: newSortOrder,
+          updated_at: new Date().toISOString(),
+        };
+      }
+      return record;
+    });
+    
+    // Batch upsert all records in a single API call
+    const { error: upsertError } = await supabase
+      .from(table)
+      .upsert(updatedRecords, { onConflict: 'id' });
+    
+    if (upsertError) throw upsertError;
+
+    // Clear relevant cache
+    const cacheKeyMap: Record<keyof typeof TABLES, string> = {
+      services: CACHE_KEYS.services,
+      categories: CACHE_KEYS.categories,
+      testimonials: CACHE_KEYS.testimonials,
+      faq: CACHE_KEYS.faq,
+      portfolio: CACHE_KEYS.portfolio,
+      portfolioCategories: CACHE_KEYS.portfolioCategories,
+      serviceHighlights: CACHE_KEYS.serviceHighlights,
+    };
+
+    const cacheKey = cacheKeyMap[tableName];
+    if (cacheKey) {
+      removeCache(cacheKey);
+    }
+  } catch (error) {
+    console.error(`Error updating sort order for ${tableName}:`, error);
     throw error;
   }
 }

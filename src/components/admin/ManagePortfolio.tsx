@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { getPortfolio, getPortfolioCategories, savePortfolioItem, deletePortfolioItem, savePortfolioCategory, deletePortfolioCategory, type Portfolio, type PortfolioCategory } from '../../utils/adminStorage';
+import { getPortfolio, getPortfolioCategories, savePortfolioItem, deletePortfolioItem, savePortfolioCategory, deletePortfolioCategory, updateSortOrder, type Portfolio, type PortfolioCategory } from '../../utils/adminStorage';
 import { AdminForm } from './AdminForm';
 import { SEOFormFields } from './SEOFormFields';
-import { DataTable } from './DataTable';
+import { SortableDataTable } from './SortableDataTable';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -104,6 +104,36 @@ export function ManagePortfolio() {
     setEditingCategory(null);
   };
 
+  const handleItemsReorder = async (reorderedItems: Portfolio[]) => {
+    // For per-category sorting, group items by category and batch update each category
+    const itemsByCategory = new Map<string, Portfolio[]>();
+    
+    // Group items by their category
+    for (const item of reorderedItems) {
+      if (!itemsByCategory.has(item.categoryId)) {
+        itemsByCategory.set(item.categoryId, []);
+      }
+      itemsByCategory.get(item.categoryId)!.push(item);
+    }
+    
+    // Batch update each category's items
+    const updatePromises = Array.from(itemsByCategory.entries()).map(([categoryId, categoryItems]) => {
+      const itemsWithOrder = categoryItems.map((item, index) => ({
+        ...item,
+        sort_order: index,
+      }));
+      return updateSortOrder('portfolio', itemsWithOrder, categoryId);
+    });
+    
+    await Promise.all(updatePromises);
+    await loadData();
+  };
+
+  const handleCategoriesReorder = async (reorderedCategories: PortfolioCategory[]) => {
+    await updateSortOrder('portfolioCategories', reorderedCategories);
+    await loadData();
+  };
+
   const columns = [
     { key: 'title', label: 'Title' },
     { 
@@ -177,11 +207,18 @@ export function ManagePortfolio() {
             </Button>
           </div>
 
-          <DataTable
-            data={portfolioItems}
+          <SortableDataTable
+            data={portfolioItems.sort((a, b) => {
+              // Sort by category first, then by sort_order within category
+              if (a.categoryId !== b.categoryId) {
+                return a.categoryId.localeCompare(b.categoryId);
+              }
+              return (a.sort_order ?? 0) - (b.sort_order ?? 0);
+            })}
             columns={columns}
             onEdit={handleItemEdit}
             onDelete={handleItemDelete}
+            onReorder={handleItemsReorder}
             keyExtractor={(item) => item.id.toString()}
           />
         </TabsContent>
@@ -207,11 +244,12 @@ export function ManagePortfolio() {
             </p>
           </div>
 
-          <DataTable
-            data={categories}
+          <SortableDataTable
+            data={categories.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))}
             columns={categoryColumns}
             onEdit={handleCategoryEdit}
             onDelete={handleCategoryDelete}
+            onReorder={handleCategoriesReorder}
             keyExtractor={(c) => c.id}
           />
         </TabsContent>
