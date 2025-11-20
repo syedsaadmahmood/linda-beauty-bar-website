@@ -223,27 +223,14 @@ export function ManageServices() {
   };
 
   const handleServicesReorder = async (reorderedServices: Service[]) => {
-    // For per-category sorting, group services by category and batch update each category
-    const servicesByCategory = new Map<string, Service[]>();
+    // Global sorting: all services sorted together regardless of category
+    const servicesWithOrder = reorderedServices.map((service, index) => ({
+      ...service,
+      sort_order: index,
+    }));
     
-    // Group services by their category
-    for (const service of reorderedServices) {
-      if (!servicesByCategory.has(service.categoryId)) {
-        servicesByCategory.set(service.categoryId, []);
-      }
-      servicesByCategory.get(service.categoryId)!.push(service);
-    }
-    
-    // Batch update each category's services
-    const updatePromises = Array.from(servicesByCategory.entries()).map(([categoryId, categoryServices]) => {
-      const servicesWithOrder = categoryServices.map((service, index) => ({
-        ...service,
-        sort_order: index,
-      }));
-      return updateSortOrder('services', servicesWithOrder, categoryId);
-    });
-    
-    await Promise.all(updatePromises);
+    // Batch update all services in one operation (no category filtering)
+    await updateSortOrder('services', servicesWithOrder);
     await loadServices();
   };
 
@@ -408,13 +395,7 @@ export function ManageServices() {
 
 
           <SortableDataTable
-            data={services.sort((a, b) => {
-              // Sort by category first, then by sort_order within category
-              if (a.categoryId !== b.categoryId) {
-                return a.categoryId.localeCompare(b.categoryId);
-              }
-              return (a.sort_order ?? 0) - (b.sort_order ?? 0);
-            })}
+            data={services.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))}
             columns={columns}
             onEdit={handleServiceEdit}
             onDelete={handleDelete}
